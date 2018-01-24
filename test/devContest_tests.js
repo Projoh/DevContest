@@ -21,7 +21,7 @@ contract('DevContest', function(accounts) {
     describe("Create instance of the DevContest contract with the test Token", function () {
 
         it("Initialized", function () {
-            return DevContest.new(mpToken.address, 0, 2000).then(function (instance) {
+            return DevContest.new(mpToken.address, 0, 20000).then(function (instance) {
                 devContest = instance;
             });
         });
@@ -134,7 +134,6 @@ contract('DevContest', function(accounts) {
 
             function success(suc) {
                 return true;
-
             }
             function fail(fail) {
                 return assert.fail('User couldnt register submission',
@@ -222,7 +221,6 @@ contract('DevContest', function(accounts) {
             });
         });
 
-
         describe("Edit a submission to a new URL leaves the old URL vacant for future use", function () {
             it("Editing submission from example to newURL", function () {
                 return devContest.editSubmission("Irrelevant", "Irrelevant", "newURL", { from: accounts[0]})
@@ -255,13 +253,12 @@ contract('DevContest', function(accounts) {
             });
         });
 
-
     });
 
-    describe("Approve submission", function () {
+    describe("APPROVE SUBMISSION", function () {
         describe("Testing Approval of submissions", function () {
             it("Approve Submission that does not exist", function () {
-                return devContest.approveSubmission(accounts[3], 1)
+                return devContest.approveSubmission(accounts[3], 3)
                     .then(fail, success);
 
                 function success() {
@@ -315,11 +312,6 @@ contract('DevContest', function(accounts) {
 
     });
 
-
-
-
-
-
     describe("STAKE", function () {
 
         describe("Stake an amount without approval", function () {
@@ -340,7 +332,6 @@ contract('DevContest', function(accounts) {
             })
         })
 
-
         describe("Approve user to stake", function () {
             it("Approve 2000 for accounts[0]", function () {
                 return mpToken.approve(devContest.address, 200).then(success, fail);
@@ -357,7 +348,6 @@ contract('DevContest', function(accounts) {
                 }
             });
         });
-
 
         describe("Stake amounts", function () {
 
@@ -413,62 +403,101 @@ contract('DevContest', function(accounts) {
 
         });
 
-        describe("RELEASE STAKE", function () {
-            describe("User doesnt have stake", function () {
-                it("Releasing Stake(1)", function () {
-                    return devContest.releaseStake(1, {from: accounts[1]})
-                        .then(fail, success);
 
-                    function success() {
-                        return true;
-                    }
-                    function fail(err) {
-                        console.log(err);
-                        return assert.fail('User could release an amount',
-                            'User couldnt release stake wihout prior staking',
-                            'User could stake a negative amount!!');
-                    }
-                });
+    });
+
+    describe("RELEASE STAKE", function () {
+        describe("User doesnt have stake", function () {
+            it("Releasing Stake(1)", function () {
+                return devContest.releaseStake(1, {from: accounts[1]})
+                    .then(fail, success);
+
+                function success() {
+                    return true;
+                }
+                function fail(err) {
+                    console.log(err);
+                    return assert.fail('User could release an amount',
+                        'User couldnt release stake wihout prior staking',
+                        'User could stake a negative amount!!');
+                }
             });
-
-            describe("User does have stake", function () {
-                it("Releasing Stake(1)", function () {
-                    return devContest.releaseStake(1, {from: accounts[0]})
-                        .then(success, fail);
-
-                    function success() {
-                        return true;
-                    }
-                    function fail(err) {
-                        console.log(err);
-                        return assert.fail('User could release an amount',
-                            'User couldnt release stake wihout prior staking',
-                            'User could stake a negative amount!!');
-                    }
-                });
-
-                it("Releasing more stake than possible(5000)", function () {
-                    return devContest.releaseStake(5000, {from: accounts[0]})
-                        .then(fail, success);
-
-                    function success() {
-                        return true;
-                    }
-                    function fail(err) {
-                        console.log(err);
-                        return assert.fail('User could stake an amount',
-                            'User couldnt release stake that was more than possible',
-                            'User could release stake on  an amount greater than existing stake!!');
-                    }
-                });
-            });
-
         });
 
-        describe("VOTE" , function () {
-            describe("User doesnt have stake", function () {
-                it("Voting", function () {
-                    return devContest.vote(accounts[0], {from: accounts[1]})
+        describe("User does have stake", function () {
+            it("Releasing Stake(1)", function () {
+                return devContest.releaseStake(1, {from: accounts[0]})
+                    .then(success, fail);
+
+                function success() {
+                    return true;
+                }
+                function fail(err) {
+                    console.log(err);
+                    return assert.fail('User could release an amount',
+                        'User couldnt release stake wihout prior staking',
+                        'User could stake a negative amount!!');
+                }
+            });
+
+            it("Releasing more stake than possible(5000)", function () {
+                return devContest.releaseStake(5000, {from: accounts[0]})
+                    .then(fail, success);
+
+                function success() {
+                    return true;
+                }
+                function fail(err) {
+                    console.log(err);
+                    return assert.fail('User could stake an amount',
+                        'User couldnt release stake that was more than possible',
+                        'User could release stake on  an amount greater than existing stake!!');
+                }
+            });
+        });
+
+    });
+
+    describe("VOTE" , function () {
+        describe("User doesnt have stake", function () {
+            it("Voting", function () {
+                return devContest.vote(accounts[0], {from: accounts[1]})
+                    .then(fail, success);
+
+                function success() {
+                    return true;
+                }
+                function fail(err) {
+                    console.log(err);
+                    return assert.fail('User could release an amount', // What happened
+                        'User couldnt release stake wihout prior staking', // What was expected
+                        'User vote without stake!!'); // Error message
+                }
+            });
+        });
+
+        describe("User does have stake", function () {
+            it("Voting", function () {
+                return devContest.vote(accounts[0], {from: accounts[0]})
+                    .then(success, fail);
+
+                function success() {
+                    return true;
+                }
+                function fail(err) {
+                    console.log(err);
+                    return assert.fail('User couldnt vote', // What happened
+                        'User could vote', // What was expected
+                        'User couldnt vote when they currently have stake!'); // Error message
+                }
+            });
+        });
+
+
+        describe("User voting multiple times", function () {
+            for(var i =0; i< 2; i++) {
+                it("Voting for time number " +i, function () {
+                    return devContest.vote(accounts[0], {from: accounts[0]})
                         .then(fail, success);
 
                     function success() {
@@ -476,155 +505,277 @@ contract('DevContest', function(accounts) {
                     }
                     function fail(err) {
                         console.log(err);
-                        return assert.fail('User could release an amount', // What happened
-                            'User couldnt release stake wihout prior staking', // What was expected
-                            'User could stake a negative amount!!'); // Error message
+                        return assert.fail('User could vote multiple times', // What happened
+                            'User could not vote', // What was expected
+                            'User could vote on count number' + i +'!'); // Error message
                     }
                 });
-            });
+            }
+        });
 
-            describe("User does have stake", function () {
-                it("Voting", function () {
-                    return devContest.vote(accounts[0], {from: accounts[0]})
-                        .then(success, fail);
 
-                    function success() {
+        describe("Vote increased check", function () {
+            it("Check if vote increased by 4", function () {
+                return devContest.submissions.call(accounts[0])
+                    .then(success, fail);
+
+                function success(obj) {
+                    var votesCount = obj[6];
+                    if(votesCount.toString() == '4') {
                         return true;
+                    } else {
+                        fail();
                     }
-                    function fail(err) {
-                        console.log(err);
-                        return assert.fail('User couldnt vote', // What happened
-                            'User could vote', // What was expected
-                            'User couldnt vote when they currently have stake!'); // Error message
-                    }
-                });
+                    return true;
+                }
+                function fail(err) {
+                    return assert.fail('User could vote multiple times', // What happened
+                        'User could not vote', // What was expected
+                        'User could vote on count number' + i +'!'); // Error message
+                }
             });
+        });
+    });
+
+    describe("REMOVE VOTE", function () {
+        it("Remove non-existing vote", function () {
+            return devContest.removeVote(accounts[0], {from: accounts[2]})
+                .then(fail, success);
+
+            function success() {
+                return true;
+            }
+            function fail(err) {
+                console.log(err);
+                return assert.fail('User could remove vote that doesnt exist', // What happened
+                    'User couldnt remove non-existent vote', // What was expected
+                    'User could remove a vote that did not exist previously'); // Error message
+            }
+        });
 
 
-            describe("User voting multiple times", function () {
-                for(var i =0; i< 2; i++) {
-                    it("Voting for time number " +i, function () {
-                        return devContest.vote(accounts[0], {from: accounts[0]})
-                            .then(fail, success);
+        it("Remove existing vote", function () {
+            return devContest.removeVote(accounts[0], {from: accounts[0]})
+                .then(success, fail);
+
+            function success() {
+                return true;
+            }
+            function fail(err) {
+                console.log(err);
+                return assert.fail('User couldnt remove previous vote', // What happened
+                    'User could remove his previous vote', // What was expected
+                    'User couldnt remove his previous vote!'); // Error message
+            }
+        });
+    });
+
+    describe("ADD BOUNTY", function () {
+        it("Add bounty without being owner of the contract", function () {
+            return devContest.addBounty(2, {from: accounts[2]})
+                .then(fail, success);
+
+            function success() {
+                return true;
+            }
+            function fail(err) {
+                console.log(err);
+                return assert.fail('User could add bounty', // What happened
+                    'User should not be able to add bounty without being owner of the contract', // What was expected
+                    'User should not be able to add bounty without being owner of the contract'); // Error message
+            }
+        });
+
+        it("Add bounty with being owner of the contract", function () {
+            return devContest.addBounty(10, {from: accounts[0]})
+                .then(success, fail);
+
+            function success() {
+                return true;
+            }
+            function fail(err) {
+                console.log(err);
+                return assert.fail('User couldnt add bounty', // What happened
+                    'User should be able to add bounty, being owner of the contract', // What was expected
+                    'User should be able to add bounty, being owner of the contract'); // Error message
+            }
+        });
+
+        it("Add negative bounty", function () {
+            return devContest.addBounty(-22, {from: accounts[0]})
+                .then(fail, success);
+
+            function success() {
+                return true;
+            }
+            function fail(err) {
+                console.log(err);
+                return assert.fail('User could add bounty', // What happened
+                    'User should not be able to add negative bounty', // What was expected
+                    'User should not be able to add negative bounty'); // Error message
+            }
+        });
+    })
+
+    describe("Complete Contest", function () {
+        const AMOUNT_OF_ENTRIES = 1;
+
+
+        describe("Submit " + AMOUNT_OF_ENTRIES + "  of entries", function () {
+            for(var entryNum=2; entryNum< 2 + AMOUNT_OF_ENTRIES; entryNum++) {
+                creatEntry(entryNum);
+            }
+
+
+
+            function creatEntry(i) {
+
+                describe("Register submission number " + i, function () {
+                    it("Register #" + i, function () {
+                        return devContest.registerSubmission("Irrelevant", "Irrelevant", "test"+i, { from: accounts[i]})
+                            .then(success, fail);
+
+                        function success(suc) {
+                            return true;
+
+                        }
+                        function fail(fail) {
+                            return assert.fail('User couldnt register submission',
+                                'User could register a submission',
+                                'User could not register a submission!' + '('+i+")");
+                        }
+                    });
+
+                });
+
+                describe("Approve submission number " + i, function () {
+                    it("Approve #"+i, function () {
+                        return devContest.approveSubmission(accounts[i], 1+i)
+                            .then(success, fail);
 
                         function success() {
                             return true;
                         }
                         function fail(err) {
-                            console.log(err);
-                            return assert.fail('User could vote multiple times', // What happened
-                                'User could not vote', // What was expected
-                                'User could vote on count number' + i +'!'); // Error message
+                            // console.log(err);
+                            return assert.fail('Submission could not be approved', // What happened
+                                'Submission could be approved', // What was expected
+                                'Submission could not be approved!'+ '('+i+")"); // Error message
                         }
                     });
-                }
-            });
+                });
 
+                describe("Approve amount to stake for user "+ i, function () {
+                    it("Approve 10 for account #" + i, function () {
+                        return mpToken.approve(devContest.address, 1, { from: accounts[i]}).then(success, fail);
 
-            describe("Vote increased check", function () {
-                    it("Check if vote increased by 4", function () {
-                        return devContest.submissions.call(accounts[0])
+                        function success(suc) {
+                            return true;
+
+                        }
+
+                        function fail(fail) {
+                            return assert.fail('User couldnt be approved',
+                                'User could be approved',
+                                'User couldn\'t be approved for 200!');
+                        }
+                    });
+                });
+
+                describe("Transfer tokens from owner to account #" +i, function () {
+                    it("Transfer 5", function () {
+                        return mpToken.transfer(accounts[i], 1)
                             .then(success, fail);
 
-                        function success(obj) {
-                            var votesCount = obj[6];
-                            if(votesCount.toString() == '4') {
-                                return true;
-                            } else {
-                                fail();
-                            }
+                        function success() {
+                            return true;
+                        }
+
+                        function fail(err) {
+                            // console.log(err);
+                            return assert.fail('User cant transfer amount',
+                                'User could transfer 5',
+                                'User('+i+') get 5 tokens from owner');
+                        }
+                    })
+                });
+
+                describe("Stake an amount for user "+ i, function () {
+                    it("Stake normal amount(1)", function () {
+                        return devContest.stake(1, {from: accounts[i]})
+                            .then(success, fail);
+
+                        function success() {
+                            return true;
+                        }
+
+                        function fail(err) {
+                            // console.log(err);
+                            return assert.fail('User couldn\'t stake an amount',
+                                'User could stake an amount',
+                                'User('+i+') couldnt stake a normal amount(1)!!');
+                        }
+                    });
+                });
+
+                describe("Vote a random submission", function () {
+                    var randomSubmission = Math.floor(Math.random() * (i+1));
+                    it("Voting for submission #" + randomSubmission, function () {
+                        return devContest.vote(accounts[randomSubmission], {from: accounts[i]})
+                            .then(success, fail);
+
+                        function success() {
                             return true;
                         }
                         function fail(err) {
-                            return assert.fail('User could vote multiple times', // What happened
-                                'User could not vote', // What was expected
-                                'User could vote on count number' + i +'!'); // Error message
+                            // console.log(err);
+                            return assert.fail('User couldnt vote for a submission', // What happened
+                                'User could vote for a sumission', // What was expected
+                                'User('+i+') could not vote for user '+ randomSubmission); // Error message
                         }
                     });
-            });
-
+                });
+            }
         });
 
-        describe("REMOVE VOTE", function () {
-            it("Remove non-existing vote", function () {
-                return devContest.removeVote(accounts[0], {from: accounts[2]})
-                    .then(fail, success);
-
-                function success() {
-                    return true;
-                }
-                function fail(err) {
-                    console.log(err);
-                    return assert.fail('User could remove vote that doesnt exist', // What happened
-                        'User couldnt remove non-existent vote', // What was expected
-                        'User could remove a vote that did not exist previously'); // Error message
-                }
-            });
-
-
-            it("Remove existing vote", function () {
-                return devContest.removeVote(accounts[0], {from: accounts[0]})
+        describe("Calculate the winner of the contest", function () {
+            it("Calculate the winner", function () {
+                return devContest.completeContest()
                     .then(success, fail);
 
-                function success() {
+                function success(output) {
                     return true;
                 }
                 function fail(err) {
                     console.log(err);
-                    return assert.fail('User couldnt remove previous vote', // What happened
-                        'User could remove his previous vote', // What was expected
-                        'User couldnt remove his previous vote!'); // Error message
+                    return assert.fail('', // What happened
+                        '', // What was expected
+                        ''); // Error message
                 }
-            });
+            })
         });
 
-        describe("ADD BOUNTY", function () {
-            it("Add bounty without being owner of the contract", function () {
-                return devContest.addBounty(2, {from: accounts[2]})
-                    .then(fail, success);
 
-                function success() {
-                    return true;
-                }
-                function fail(err) {
-                    console.log(err);
-                    return assert.fail('User could add bounty', // What happened
-                        'User should not be able to add bounty without being owner of the contract', // What was expected
-                        'User should not be able to add bounty without being owner of the contract'); // Error message
-                }
-            });
-
-            it("Add bounty with being owner of the contract", function () {
-                return devContest.addBounty(10, {from: accounts[0]})
+        describe("Confirming Winner and vote amount", function () {
+            it("Winner was submitted", function () {
+                return devContest.winningAddress.call()
                     .then(success, fail);
 
-                function success() {
-                    return true;
+                function success(value) {
+                    return devContest.submissions.call(value).then(function (approvedSub) {
+                        console.log("ADDRESS: "+value + "(VOTES: " +approvedSub[6].toString()+")");
+                    })
                 }
                 function fail(err) {
-                    console.log(err);
-                    return assert.fail('User couldnt add bounty', // What happened
-                        'User should be able to add bounty, being owner of the contract', // What was expected
-                        'User should be able to add bounty, being owner of the contract'); // Error message
-                }
+                    return assert.fail('Submission could not be approved', // What happened
+                        'Submission could be approved', // What was expected
+                        'Submission could not be approved!'); // Error message
+                };
             });
 
-            it("Add negative bounty", function () {
-                return devContest.addBounty(-22, {from: accounts[0]})
-                    .then(fail, success);
-
-                function success() {
-                    return true;
-                }
-                function fail(err) {
-                    console.log(err);
-                    return assert.fail('User could add bounty', // What happened
-                        'User should not be able to add negative bounty', // What was expected
-                        'User should not be able to add negative bounty'); // Error message
-                }
-            });
         })
-    });
+
+    })
 
 
 

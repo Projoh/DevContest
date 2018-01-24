@@ -70,6 +70,9 @@ contract DevContest {
   uint256 public startBlock;
   uint256 public endBlock;
 
+  // Keep track of winning submission
+  uint256 public winnerCursor;
+
   /*
   * Events
   */
@@ -88,6 +91,7 @@ contract DevContest {
       endBlock = _endBlock;
       // Set id to 1 to reject submissions not in approvedSubmissions
       id = 1;
+      winnerCursor = 0;
   }
 
     /*
@@ -270,8 +274,8 @@ contract DevContest {
 
     uint256 subCount = approvedSubmissions.length;
 
-    for (uint8 i= 0; i<subCount; i+=1 ) {
-      address subAddress = approvedSubmissions[i];
+    for (; winnerCursor<subCount; winnerCursor+=1 ) {
+      address subAddress = approvedSubmissions[winnerCursor];
       Submission sub = submissions[subAddress];
 
       //need to deal with tie case
